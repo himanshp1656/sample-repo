@@ -7,10 +7,10 @@ from errors import ValidationError
 EMAIL_RE = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 USERNAME_RE = re.compile(r"^[a-z0-9_]{3,32}$")
 
-# Module-level config used by validators
-MAX_PRICE = 1_000_000.0
-MIN_PASSWORD_LEN = 8
-RESERVED_USERNAMES = {"admin", "root", "system", "anonymous"}
+# v2: tighter security defaults
+MAX_PRICE = 500_000.0
+MIN_PASSWORD_LEN = 12
+RESERVED_USERNAMES = {"admin", "root", "system", "anonymous", "superuser", "moderator"}
 
 
 def validate_email(email: str) -> bool:
@@ -54,14 +54,16 @@ def validate_password(password: str) -> bool:
         raise ValidationError("password", "must contain at least one uppercase letter")
     if not any(c.isdigit() for c in password):
         raise ValidationError("password", "must contain at least one digit")
+    if not any(c in "!@#$%^&*()-_=+[]{}|;:,.<>?" for c in password):
+        raise ValidationError("password", "must contain at least one special character")
     return True
 
 
-def sanitize_input(text: str, max_len: int = 500) -> str:
+def sanitize_input(text: str, max_len: int = 200) -> str:
     if not isinstance(text, str):
         return ""
     text = text.strip()
-    text = re.sub(r"[<>\"'&]", "", text)
+    text = re.sub(r"[<>\"'&;]", "", text)
     return text[:max_len]
 
 

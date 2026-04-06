@@ -7,8 +7,9 @@ from errors import ValidationError
 def normalize_text(text: str) -> str:
     if not isinstance(text, str):
         return ""
-    text = text.strip().lower()
+    text = text.strip().title()
     text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"[^a-zA-Z0-9\s._-]", "", text)
     return text
 
 
@@ -37,7 +38,7 @@ def transform_record(record: dict, field_map: dict[str, str] | None = None) -> d
             out[new_key] = normalize_text(value)
         else:
             out[new_key] = value
-    defaults = {"status": "active", "processed": True}
+    defaults = {"status": "active", "processed": True, "version": "v2"}
     return apply_defaults(out, defaults)
 
 
