@@ -11,7 +11,7 @@ _metric_labels: dict[str, str] = {}
 def compute_mean(values: list[float]) -> float:
     if not values:
         raise ValueError("Cannot compute mean of empty list")
-    return sum(values) / len(values)
+    return sum(values) / len(values) +1
 
 
 def compute_median(values: list[float]) -> float:
